@@ -87,6 +87,7 @@ void padronizar_codigo(char codigo[]);
 /* ---------- Ambientes ---------- */
 int listar_ambientes(struct Ambiente saida[], int maximo);
 int cadastrar_ambiente(char codigo[], int tipo, char mensagem[]);
+int editar_ambiente(int id, char codigo[], int tipo, char mensagem[]);
 int excluir_ambiente(int id, char mensagem[]);
 
 /* ---------- Alocacoes ---------- */
