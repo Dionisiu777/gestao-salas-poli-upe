@@ -373,6 +373,82 @@ int criar_alocacao(char turma[], char disciplina[], char professor[],
     return 0;
 }
 
+int editar_alocacao(int id, char turma[], char disciplina[],
+                    char professor[], int id_ambiente, int dia,
+                    int inicio, int fim, char mensagem[]) {
+    int i, pos;
+    struct Alocacao anterior;
+
+    /* Procura a alocacao pelo ID */
+    for (i = 0; i < total_alocacoes; i++) {
+        if (alocacoes[i].id == id && alocacoes[i].ativo == 1) {
+            break;
+        }
+    }
+
+    if (i == total_alocacoes) {
+        strcpy(mensagem, "Alocacao nao encontrada");
+        return -1;
+    }
+
+    /* Valida os dados informados */
+    if (strlen(turma) == 0 || strlen(disciplina) == 0) {
+        strcpy(mensagem, "Informe turma e disciplina");
+        return -1;
+    }
+
+    if (dia < SEGUNDA || dia > SABADO) {
+        strcpy(mensagem, "Dia da semana invalido");
+        return -1;
+    }
+
+    if (!horario_valido(inicio, fim)) {
+        strcpy(mensagem, "Horario invalido");
+        return -1;
+    }
+
+    /* Verifica se o ambiente existe e esta ativo */
+    pos = buscar_ambiente_por_id(id_ambiente);
+
+    if (pos == -1 || ambientes[pos].ativo == 0) {
+        strcpy(mensagem, "Ambiente nao encontrado");
+        return -1;
+    }
+
+    /* Guarda os dados antigos para possivel restauracao */
+    anterior = alocacoes[i];
+
+    /* Desativa temporariamente a propria alocacao
+       para nao gerar conflito com ela mesma */
+    alocacoes[i].ativo = 0;
+
+    if (ambiente_ocupado(id_ambiente, dia, inicio, fim, NENHUM_ID)) {
+        alocacoes[i] = anterior;
+        strcpy(mensagem, "Sala ocupada nesse periodo");
+        return -1;
+    }
+
+    /* Atualiza os dados */
+    strcpy(alocacoes[i].turma, turma);
+    strcpy(alocacoes[i].disciplina, disciplina);
+    strcpy(alocacoes[i].professor, professor);
+    alocacoes[i].id_ambiente = id_ambiente;
+    alocacoes[i].dia_semana = dia;
+    alocacoes[i].hora_inicio = inicio;
+    alocacoes[i].hora_fim = fim;
+    alocacoes[i].ativo = 1;
+
+    /* Salva as alteracoes */
+    if (salvar_alocacoes(alocacoes, total_alocacoes) != 0) {
+        alocacoes[i] = anterior;
+        strcpy(mensagem, "Erro ao gravar arquivo de alocacoes");
+        return -1;
+    }
+
+    strcpy(mensagem, "Alocacao atualizada com sucesso");
+    return 0;
+}
+
 int cancelar_alocacao(int id, char mensagem[]) {
     int i;
 
