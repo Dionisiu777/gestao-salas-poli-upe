@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="gestao-salas-poli-upe" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Teste backend">
+				<Option output="bin/teste_backend" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="." />
+				<Option object_output="obj/teste_backend" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add directory="include" />
+				</Compiler>
+				<ExtraCommands>
+					<Add before="cmd /c if exist dados\*.dat del /q dados\*.dat" />
+				</ExtraCommands>
+			</Target>
+			<Target title="Carregar exemplo">
+				<Option output="bin/carregar_exemplo" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="." />
+				<Option object_output="obj/carregar_exemplo" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add directory="include" />
+				</Compiler>
+				<ExtraCommands>
+					<Add before="cmd /c if exist dados\*.dat del /q dados\*.dat" />
+				</ExtraCommands>
+			</Target>
+		</Build>
+		<Unit filename="include/arquivos.h">
+			<Option target="Teste backend" />
+			<Option target="Carregar exemplo" />
+		</Unit>
+		<Unit filename="include/backend.h">
+			<Option target="Teste backend" />
+			<Option target="Carregar exemplo" />
+		</Unit>
+		<Unit filename="include/interface.h">
+			<Option target="Teste backend" />
+			<Option target="Carregar exemplo" />
+		</Unit>
+		<Unit filename="src/arquivos.c">
+			<Option compilerVar="CC" />
+			<Option target="Teste backend" />
+			<Option target="Carregar exemplo" />
+		</Unit>
+		<Unit filename="src/backend.c">
+			<Option compilerVar="CC" />
+			<Option target="Teste backend" />
+			<Option target="Carregar exemplo" />
+		</Unit>
+		<Unit filename="src/interface.c">
+			<Option compilerVar="CC" />
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="src/main.c">
+			<Option compilerVar="CC" />
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="teste/carregar_exemplo.c">
+			<Option compilerVar="CC" />
+			<Option target="Carregar exemplo" />
+		</Unit>
+		<Unit filename="teste/teste_backend.c">
+			<Option compilerVar="CC" />
+			<Option target="Teste backend" />
+		</Unit>
+		<Extensions />
+	</Project>
+</CodeBlocks_project_file>
