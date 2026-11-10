@@ -95,6 +95,9 @@ int listar_alocacoes(struct Alocacao saida[], int maximo);
 int criar_alocacao(char turma[], char disciplina[], char professor[],
                    int id_ambiente, int dia, int inicio, int fim,
                    char mensagem[]);
+int editar_alocacao(int id, char turma[], char disciplina[],
+                    char professor[], int id_ambiente, int dia,
+                    int inicio, int fim, char mensagem[]);
 int cancelar_alocacao(int id, char mensagem[]);
 
 /* ---------- Disponibilidade ---------- */
