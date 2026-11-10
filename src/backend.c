@@ -221,6 +221,51 @@ int cadastrar_ambiente(char codigo[], int tipo, char mensagem[]) {
     return 0;
 }
 
+/* faz a edição do codigo e o tipo de um ambiente ja cadastrado. */
+int editar_ambiente(int id, char codigo[], int tipo, char mensagem[]) {
+    int pos, i;
+    struct Ambiente anterior;
+
+    pos = buscar_ambiente_por_id(id);
+    if (pos == -1 || ambientes[pos].ativo == 0) {
+        strcpy(mensagem, "Ambiente nao encontrado");
+        return -1;
+    }
+
+    padronizar_codigo(codigo);
+    if (strlen(codigo) == 0) {
+        strcpy(mensagem, "Informe o codigo do ambiente");
+        return -1;
+    }
+
+    if (tipo != SALA && tipo != LABORATORIO) {
+        strcpy(mensagem, "Tipo de ambiente invalido");
+        return -1;
+    }
+
+    /* Verifica se o codigo ja pertence a outro ambiente ativo. */
+    for (i = 0; i < total_ambientes; i++) {
+        if (i != pos && ambientes[i].ativo == 1
+            && strcmp(ambientes[i].codigo, codigo) == 0) {
+            strcpy(mensagem, "Ja existe outro ambiente com esse codigo");
+            return -1;
+        }
+    }
+
+    anterior = ambientes[pos];
+    strcpy(ambientes[pos].codigo, codigo);
+    ambientes[pos].tipo = tipo;
+
+    if (salvar_ambientes(ambientes, total_ambientes) != 0) {
+        ambientes[pos] = anterior;
+        strcpy(mensagem, "Erro ao gravar arquivo de ambientes");
+        return -1;
+    }
+
+    strcpy(mensagem, "Ambiente atualizado com sucesso");
+    return 0;
+}
+
 int excluir_ambiente(int id, char mensagem[]) {
     int pos, i;
 
