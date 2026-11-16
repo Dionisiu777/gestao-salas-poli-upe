@@ -23,7 +23,7 @@ struct Ambiente v_ambientes[MAX_AMBIENTES];
 int qtd_ambientes = 0;
 
 struct Alocacao v_alocacoes[MAX_ALOCACOES];
-int qtd_alocacoes = 0;
+int qtd_alocacoes = 0;+
 
 struct Reserva v_reservas[MAX_RESERVAS];
 int qtd_reservas = 0;
