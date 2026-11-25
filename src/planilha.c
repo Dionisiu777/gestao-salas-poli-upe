@@ -4,7 +4,7 @@
 #include "planilha.h"
 #include "backend.h"
 int c_invalido (char c){            //Verifica se o caracter é inválido
-    if (c != '\0' & strchr(" \n\r\t", c) != NULL)
+    if (c != '\0' && strchr(" \n\r\t", c) != NULL)
         return 1;
     else
     return 0;

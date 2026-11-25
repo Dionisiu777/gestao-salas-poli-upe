@@ -18,9 +18,9 @@
  *             Retorna 0 se gravou tudo, -1 se houve falha.
  */
 
-#define ARQUIVO_AMBIENTES "dados/ambientes.dat"
-#define ARQUIVO_ALOCACOES "dados/alocacoes.dat"
-#define ARQUIVO_RESERVAS  "dados/reservas.dat"
+#define ARQUIVO_AMBIENTES "dados/testeambientes.dat"
+#define ARQUIVO_ALOCACOES "dados/testealocacoes.dat"
+#define ARQUIVO_RESERVAS  "dados/testereservas.dat"
 
 int carregar_ambientes(struct Ambiente vetor[], int maximo);
 int salvar_ambientes(struct Ambiente vetor[], int total);
