@@ -334,7 +334,7 @@ void clicou_salvar_aloc(GtkWidget *b, gpointer d) {
     int ini = texto_para_minutos(gtk_editable_get_text(GTK_EDITABLE(ent_ini_aloc)));
     int fim = texto_para_minutos(gtk_editable_get_text(GTK_EDITABLE(ent_fim_aloc)));
     int res;
-
+    
     strcpy(turma, gtk_editable_get_text(GTK_EDITABLE(ent_turma)));
     strcpy(disc, gtk_editable_get_text(GTK_EDITABLE(ent_disc)));
     strcpy(prof, gtk_editable_get_text(GTK_EDITABLE(ent_prof)));
