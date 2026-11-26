@@ -17,6 +17,7 @@
 /* ============================================================ */
 
 GtkWidget *stack_telas;
+GtkWidget *msg_menu;
 
 /* Vetores auxiliares para saber qual item o usuario clicou na lista */
 struct Ambiente v_ambientes[MAX_AMBIENTES];
@@ -334,7 +335,7 @@ void clicou_salvar_aloc(GtkWidget *b, gpointer d) {
     int ini = texto_para_minutos(gtk_editable_get_text(GTK_EDITABLE(ent_ini_aloc)));
     int fim = texto_para_minutos(gtk_editable_get_text(GTK_EDITABLE(ent_fim_aloc)));
     int res;
-    
+
     strcpy(turma, gtk_editable_get_text(GTK_EDITABLE(ent_turma)));
     strcpy(disc, gtk_editable_get_text(GTK_EDITABLE(ent_disc)));
     strcpy(prof, gtk_editable_get_text(GTK_EDITABLE(ent_prof)));
@@ -484,6 +485,76 @@ void confirmar_cancelamento_res(GtkWidget *b, gpointer d) {
 
 void desistir_cancelamento_res(GtkWidget *b, gpointer d) {
     gtk_widget_set_visible(conf_res, FALSE);
+}
+
+/* ============================================================ */
+/*                      IMPORTACAO DE CSV                       */
+/* ============================================================ */
+
+int dia_para_numero(char *d) {
+    if (strncmp(d, "SEG", 3) == 0) return SEGUNDA;
+    if (strncmp(d, "TER", 3) == 0) return TERCA;
+    if (strncmp(d, "QUA", 3) == 0) return QUARTA;
+    if (strncmp(d, "QUI", 3) == 0) return QUINTA;
+    if (strncmp(d, "SEX", 3) == 0) return SEXTA;
+    if (strncmp(d, "SAB", 3) == 0 || strncmp(d, "SÁB", 3) == 0) return SABADO;
+    return -1;
+}
+
+void clicou_importar_csv(GtkWidget *b, gpointer d) {
+    FILE *f = fopen("dados/importar.csv", "r");
+    char linha[512], msg[TAM_MENSAGEM], resumo[150], sala_cod[TAM_CODIGO];
+    int importadas = 0, ignoradas = 0, i, id_amb, dia, ini, fim, tipo;
+
+    if (f == NULL) {
+        gtk_label_set_text(GTK_LABEL(msg_menu), "Crie o arquivo dados/importar.csv primeiro.");
+        return;
+    }
+
+    while (fgets(linha, sizeof(linha), f) != NULL) {
+        linha[strcspn(linha, "\r\n")] = '\0';
+        char *turma = strtok(linha, ";");
+        char *disc  = strtok(NULL, ";");
+        char *prof  = strtok(NULL, ";");
+        char *sala  = strtok(NULL, ";");
+        char *s_dia = strtok(NULL, ";");
+        char *s_ini = strtok(NULL, ";");
+        char *s_fim = strtok(NULL, ";");
+
+        if (!turma || !disc || !prof || !sala || !s_dia || !s_ini || !s_fim) continue;
+        if (strstr(turma, "TURMA") != NULL) continue;
+
+        strncpy(sala_cod, sala, TAM_CODIGO - 1);
+        sala_cod[TAM_CODIGO - 1] = '\0';
+        padronizar_codigo(sala_cod);
+
+        tipo = (strstr(sala_cod, "LIP") || strstr(sala_cod, "LM") || strstr(sala_cod, "LAB"))
+               ? LABORATORIO : SALA;
+        cadastrar_ambiente(sala_cod, tipo, msg);
+
+        qtd_ambientes = listar_ambientes(v_ambientes, MAX_AMBIENTES);
+        id_amb = -1;
+        for (i = 0; i < qtd_ambientes; i++) {
+            if (strcmp(v_ambientes[i].codigo, sala_cod) == 0) {
+                id_amb = v_ambientes[i].id;
+                break;
+            }
+        }
+
+        dia = dia_para_numero(s_dia);
+        ini = texto_para_minutos(s_ini);
+        fim = texto_para_minutos(s_fim);
+
+        if (id_amb != -1 && criar_alocacao(turma, disc, prof, id_amb, dia, ini, fim, msg) == 0) {
+            importadas++;
+        } else {
+            ignoradas++;
+        }
+    }
+
+    fclose(f);
+    sprintf(resumo, "Importacao concluida: %d cadastradas, %d ignoradas.", importadas, ignoradas);
+    gtk_label_set_text(GTK_LABEL(msg_menu), resumo);
 }
 
 /* ============================================================ */
@@ -773,6 +844,7 @@ GtkWidget* montar_tela_menu(void) {
     GtkWidget *b_alo = gtk_button_new_with_label("Alocacoes");
     GtkWidget *b_dis = gtk_button_new_with_label("Disponibilidade");
     GtkWidget *b_res = gtk_button_new_with_label("Reservas");
+    GtkWidget *b_imp = gtk_button_new_with_label("Importar CSV");
 
     gtk_widget_set_valign(box, GTK_ALIGN_CENTER);
     gtk_widget_set_halign(box, GTK_ALIGN_CENTER);
@@ -781,17 +853,23 @@ GtkWidget* montar_tela_menu(void) {
     gtk_widget_set_size_request(b_alo, 220, 40);
     gtk_widget_set_size_request(b_dis, 220, 40);
     gtk_widget_set_size_request(b_res, 220, 40);
+    gtk_widget_set_size_request(b_imp, 220, 40);
 
     g_signal_connect(b_amb, "clicked", G_CALLBACK(ir_para_tela), "ambientes");
     g_signal_connect(b_alo, "clicked", G_CALLBACK(ir_para_tela), "alocacoes");
     g_signal_connect(b_dis, "clicked", G_CALLBACK(ir_para_tela), "disponibilidade");
     g_signal_connect(b_res, "clicked", G_CALLBACK(ir_para_tela), "reservas");
+    g_signal_connect(b_imp, "clicked", G_CALLBACK(clicou_importar_csv), NULL);
+
+    msg_menu = gtk_label_new("");
 
     gtk_box_append(GTK_BOX(box), gtk_label_new("Sistema de Gestao de Salas — POLI-UPE"));
     gtk_box_append(GTK_BOX(box), b_amb);
     gtk_box_append(GTK_BOX(box), b_alo);
     gtk_box_append(GTK_BOX(box), b_dis);
     gtk_box_append(GTK_BOX(box), b_res);
+    gtk_box_append(GTK_BOX(box), b_imp);
+    gtk_box_append(GTK_BOX(box), msg_menu);
     return box;
 }
 
