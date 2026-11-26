@@ -3,5 +3,6 @@
 
 int importar_planilhas(const char *caminho, char mensagem[]);
 int exportar_planilhas(const char *caminho, char mensagem[]);
+void limpar_string (char *string);
 
 #endif
